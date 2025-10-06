@@ -55,7 +55,31 @@ def run_streamlit_app():
     adk_runner, current_session_id = initialize_adk()
     
     # Display session ID for debugging purposes
-    st.sidebar.text(f"Current ADK Session ID: {current_session_id}")
+    st.sidebar.title('Info')
+    st.sidebar.divider()
+    st.sidebar.info(
+        '''
+        This app allows users to search for things to do in the Florence Metropolitan Area 
+        and provide customized interests and hobbies for a tailored experience.
+
+
+        ---
+
+        :red[Coming Soon:] 
+        
+        - Better search results (by taking date and time into account)
+
+        - Map
+
+        - Chatbot
+
+        ---
+
+        :orange[Developed] :orange[by:]
+        Charles Crocicchia & Alex Fratoni
+        '''
+    )
+
     print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
     
 

@@ -128,7 +128,7 @@ def run_streamlit_app():
                     st.text_input(
                         f"Interest #{i + 1}", 
                         key=f'interest_input_{i}',
-                        placeholder="e.g., Hiking, Cooking, Python"
+                        placeholder="e.g., Art, Jazz, Farmer's Markets"
                     )
 
                 # The form submission button

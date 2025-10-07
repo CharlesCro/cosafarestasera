@@ -47,6 +47,8 @@ def run_streamlit_app():
         st.session_state.agent_response = None
     if 'range_on' not in st.session_state:
         st.session_state.range_on = False
+    if 'search' not in st.session_state:
+        st.session_state.search = False
 
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
     st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
@@ -99,9 +101,9 @@ def run_streamlit_app():
             st.session_state.range_on = True
         else:
             st.session_state.range_on = False
-            
+
         if st.session_state.range_on:
-            st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
+            st.session_state.date_range = st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
         else:
             st.session_state.date_range = st.date_input('Enter date', format="MM.DD.YYYY")
 
@@ -109,18 +111,8 @@ def run_streamlit_app():
 
         if st.session_state.interest_values:
 
-            if st.button('What should I do tonight?', type = 'primary'):
-                prompt = f"""
-                        Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
-                        User Interests: {sorted(list(set(st.session_state.interest_values)))}
-                        Date Range: {st.session_state.date_range}
-                        Location: {st.session_state.location}
-                        """
-                
-                with st.spinner('Searching...', show_time = True):
-                    agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
-
-                    st.session_state.agent_response = agent_response
+            if st.button('Search', type = 'primary'):
+                st.session_state.search = True
         else:
             st.info('Please Add Interests to Begin Search')
 
@@ -171,8 +163,23 @@ def run_streamlit_app():
             
 
     with right:
+        
+        if st.session_state.search:
+            prompt = f"""
+                        Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
+                        User Interests: {sorted(list(set(st.session_state.interest_values)))}
+                        Date Range: {st.session_state.date_range}
+                        Location: {st.session_state.location}
+                        """
+                
+            with st.spinner('Searching...', show_time = True):
+                agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
+
+                st.session_state.agent_response = agent_response
+            st.session_state.search = False
+
         if st.session_state.agent_response:
-            st.markdown(agent_response)
+            st.markdown(st.session_state.agent_response)
 
     st.header('', divider = 'blue')
 

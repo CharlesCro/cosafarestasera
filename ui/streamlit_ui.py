@@ -45,7 +45,7 @@ def run_streamlit_app():
 
     if 'interest_values' not in st.session_state:
         st.session_state.interest_values = [] # Final list to store unique interests
-        
+
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
     st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
     st.caption('Powered by ADK & Gemini') # Descriptive text.
@@ -70,7 +70,7 @@ def run_streamlit_app():
 
         :red[Coming Soon:] 
         
-        - Better search results (by taking date and time into account)
+        - Better search results, better UI
 
         - Map
 

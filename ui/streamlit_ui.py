@@ -3,11 +3,7 @@ import streamlit as st
 from services.adk_service import initialize_adk, run_adk_sync
 from config.settings import MESSAGE_HISTORY_KEY, get_api_key
 
-if 'interests_count' not in st.session_state:
-    st.session_state.interests_count = 1  # Start with one input box
 
-if 'interest_values' not in st.session_state:
-    st.session_state.interest_values = [] # Final list to store unique interests
 
 
 def add_new_field():
@@ -44,6 +40,12 @@ def run_streamlit_app():
     '''
     Sets up and runs the Streamlit web application for the ADK chat assistant.
     '''
+    if 'interests_count' not in st.session_state:
+        st.session_state.interests_count = 1  # Start with one input box
+
+    if 'interest_values' not in st.session_state:
+        st.session_state.interest_values = [] # Final list to store unique interests
+        
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
     st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
     st.caption('Powered by ADK & Gemini') # Descriptive text.
@@ -60,7 +62,7 @@ def run_streamlit_app():
     st.sidebar.divider()
     st.sidebar.info(
         '''
-        This app allows users to search for things to do in the Florence Metropolitan Area 
+        This app allows users to search for things to do in the specified date, location
         and provide customized interests and hobbies for a tailored experience.
 
 

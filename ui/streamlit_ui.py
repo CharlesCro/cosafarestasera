@@ -4,8 +4,6 @@ from services.adk_service import initialize_adk, run_adk_sync
 from config.settings import MESSAGE_HISTORY_KEY, get_api_key
 
 
-
-
 def add_new_field():
     """Callback function to increase the number of input fields."""
     st.session_state.interests_count += 1
@@ -45,6 +43,8 @@ def run_streamlit_app():
 
     if 'interest_values' not in st.session_state:
         st.session_state.interest_values = [] # Final list to store unique interests
+    if 'agent_response' not in st.session_state:
+        st.session_state.agent_response = None
 
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
     st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
@@ -85,77 +85,86 @@ def run_streamlit_app():
 
     print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
     
+    left, right = st.columns([1, 2], border = True)
 
-    # Create a container for the input fields and "add" button
-    input_container = st.container()
+   
+    with left:
+         # Create a container for the input fields and "add" button
+        
+        input_container = st.container()
+        with input_container:
+            # A button to add a new input field (uses a callback to update the count)
+            st.button(":material/add: Add Another Interest Field", on_click=add_new_field)
 
-    with input_container:
-        # A button to add a new input field (uses a callback to update the count)
-        st.button(":material/add: Add Another Interest Field", on_click=add_new_field)
+            # A Streamlit Form to batch the text inputs and submission button
+            with st.form(key='interest_form'):
+                st.subheader("Your Interests")
+                
+                # Loop to dynamically generate the required number of text input boxes
+                for i in range(st.session_state.interests_count):
+                    # IMPORTANT: A unique 'key' is required for every widget,
+                    # especially in a loop, to store its value in st.session_state.
+                    st.text_input(
+                        f"Interest #{i + 1}", 
+                        key=f'interest_input_{i}',
+                        placeholder="e.g., Hiking, Cooking, Python"
+                    )
 
-        # A Streamlit Form to batch the text inputs and submission button
-        with st.form(key='interest_form'):
-            st.subheader("Your Interests")
-            
-            # Loop to dynamically generate the required number of text input boxes
-            for i in range(st.session_state.interests_count):
-                # IMPORTANT: A unique 'key' is required for every widget,
-                # especially in a loop, to store its value in st.session_state.
-                st.text_input(
-                    f"Interest #{i + 1}", 
-                    key=f'interest_input_{i}',
-                    placeholder="e.g., Hiking, Cooking, Python"
+                # The form submission button
+                st.form_submit_button(
+                    label='Submit All Interests', 
+                    on_click=process_form_submission
                 )
 
-            # The form submission button
-            st.form_submit_button(
-                label='Submit All Interests', 
-                on_click=process_form_submission
-            )
 
+        ## Stored Interests
 
-    ## Stored Interests
+        st.subheader("List of Unique Stored Interests")
 
-    st.subheader("List of Unique Stored Interests")
+        if st.session_state.interest_values:
+            # Convert the list to a set and back to a list just in case any duplicates slipped through,
+            # then display them as a list of bullet points.
+            unique_interests = sorted(list(set(st.session_state.interest_values)))
+            st.write("Current unique interests:")
+            st.markdown('\n'.join([f"- {i.title()}" for i in unique_interests]))
 
-    if st.session_state.interest_values:
-        # Convert the list to a set and back to a list just in case any duplicates slipped through,
-        # then display them as a list of bullet points.
-        unique_interests = sorted(list(set(st.session_state.interest_values)))
-        st.write("Current unique interests:")
-        st.markdown('\n'.join([f"- {i.title()}" for i in unique_interests]))
-
-        st.session_state.interests = unique_interests
-        
-        # A button to clear the stored list of interests
-        if st.button("Clear Saved Interests"):
-            st.session_state.interest_values = []
-            st.rerun()
-    
-        st.session_state.location = st.text_input('Enter Location', width = 250)
-
-        today = datetime.datetime.now()
-        st.session_state.date_range = st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
-
-
-        if st.button('What should I do tonight?', type = 'primary'):
-            prompt = f"""
-                    Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
-                    User Interests: {unique_interests}
-                    Date Range: {st.session_state.date_range}
-                    Location: {st.session_state.location}
-                    """
+            st.session_state.interests = unique_interests
             
-            with st.spinner('Searching...', show_time = True):
-                agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
-            st.divider()
+            # A button to clear the stored list of interests
+            if st.button("Clear Saved Interests"):
+                st.session_state.interest_values = []
+                st.rerun()
+        
+            st.session_state.location = st.text_input('Enter Location', width = 250)
 
+            today = datetime.datetime.now()
+            st.session_state.date_range = st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
+
+
+            if st.button('What should I do tonight?', type = 'primary'):
+                prompt = f"""
+                        Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
+                        User Interests: {unique_interests}
+                        Date Range: {st.session_state.date_range}
+                        Location: {st.session_state.location}
+                        """
+                
+                with st.spinner('Searching...', show_time = True):
+                    agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
+                st.divider()
+
+                st.session_state.agent_response = agent_response
+        else:
+            st.info("No interests have been submitted yet.")
+
+    with right:
+        if st.session_state.agent_response:
             st.markdown(agent_response)
-    else:
-        st.info("No interests have been submitted yet.")
-
 
     st.header('', divider = 'blue')
+
+
+
     '''
     # Initialize chat message history in Streamlit's session state if it doesn't exist.
     if MESSAGE_HISTORY_KEY not in st.session_state:

@@ -1,3 +1,4 @@
+import datetime
 import streamlit as st
 from services.adk_service import initialize_adk, run_adk_sync
 from config.settings import MESSAGE_HISTORY_KEY, get_api_key
@@ -128,11 +129,19 @@ def run_streamlit_app():
         if st.button("Clear Saved Interests"):
             st.session_state.interest_values = []
             st.rerun()
+    
+        st.session_state.location = st.text_input('Enter Location', width = 250)
+
+        today = datetime.datetime.now()
+        st.session_state.date_range = st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
+
 
         if st.button('What should I do tonight?', type = 'primary'):
             prompt = f"""
-                    Conduct a google search of the Florence Metropolitan Area to help the user find an activity/event based on their provided interests below:
+                    Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
                     User Interests: {unique_interests}
+                    Date Range: {st.session_state.date_range}
+                    Location: {st.session_state.location}
                     """
             
             with st.spinner('Searching...', show_time = True):

@@ -89,12 +89,33 @@ def run_streamlit_app():
 
    
     with left:
+        st.session_state.location = st.text_input('Enter Location', width = 250, placeholder = 'e.g., Firenze, Italia')
+
+        st.session_state.date_range = st.date_input('Enter date', format="MM.DD.YYYY")
+
+        if st.session_state.interest_values:
+
+            if st.button('What should I do tonight?', type = 'primary'):
+                prompt = f"""
+                        Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
+                        User Interests: {sorted(list(set(st.session_state.interest_values)))}
+                        Date Range: {st.session_state.date_range}
+                        Location: {st.session_state.location}
+                        """
+                
+                with st.spinner('Searching...', show_time = True):
+                    agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
+
+                    st.session_state.agent_response = agent_response
+        else:
+            st.info('Please Add Interests to Begin Search')
+
+        st.header('', divider = 'red')
          # Create a container for the input fields and "add" button
-        
         input_container = st.container()
         with input_container:
             # A button to add a new input field (uses a callback to update the count)
-            st.button(":material/add: Add Another Interest Field", on_click=add_new_field)
+            st.button(":material/add: Add Field", on_click=add_new_field)
 
             # A Streamlit Form to batch the text inputs and submission button
             with st.form(key='interest_form'):
@@ -119,8 +140,6 @@ def run_streamlit_app():
 
         ## Stored Interests
 
-        st.subheader("List of Unique Stored Interests")
-
         if st.session_state.interest_values:
             # Convert the list to a set and back to a list just in case any duplicates slipped through,
             # then display them as a list of bullet points.
@@ -135,27 +154,7 @@ def run_streamlit_app():
                 st.session_state.interest_values = []
                 st.rerun()
         
-            st.session_state.location = st.text_input('Enter Location', width = 250)
-
-            today = datetime.datetime.now()
-            st.session_state.date_range = st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
-
-
-            if st.button('What should I do tonight?', type = 'primary'):
-                prompt = f"""
-                        Conduct a google search of an area to help the user find an activity/event based on their provided interests below. Ensure the events are relevant and occur on the day at the place provided:
-                        User Interests: {unique_interests}
-                        Date Range: {st.session_state.date_range}
-                        Location: {st.session_state.location}
-                        """
-                
-                with st.spinner('Searching...', show_time = True):
-                    agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
-                st.divider()
-
-                st.session_state.agent_response = agent_response
-        else:
-            st.info("No interests have been submitted yet.")
+            
 
     with right:
         if st.session_state.agent_response:

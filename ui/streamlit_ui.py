@@ -45,6 +45,8 @@ def run_streamlit_app():
         st.session_state.interest_values = [] # Final list to store unique interests
     if 'agent_response' not in st.session_state:
         st.session_state.agent_response = None
+    if 'range_on' not in st.session_state:
+        st.session_state.range_on = False
 
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
     st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
@@ -87,11 +89,23 @@ def run_streamlit_app():
     
     left, right = st.columns([1, 2], border = True)
 
-   
+    
     with left:
         st.session_state.location = st.text_input('Enter Location', width = 250, placeholder = 'e.g., Firenze, Italia')
 
-        st.session_state.date_range = st.date_input('Enter date', format="MM.DD.YYYY")
+        today = datetime.datetime.now()
+
+        if st.toggle('Select Multiple Days'):
+            st.session_state.range_on = True
+        else:
+            st.session_state.range_on = False
+            
+        if st.session_state.range_on:
+            st.date_input('Enter date', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
+        else:
+            st.session_state.date_range = st.date_input('Enter date', format="MM.DD.YYYY")
+
+        
 
         if st.session_state.interest_values:
 

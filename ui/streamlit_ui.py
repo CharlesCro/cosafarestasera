@@ -69,6 +69,8 @@ def run_streamlit_app():
         This app allows users to search for things to do in the specified date, location
         and provide customized interests and hobbies for a tailored experience.
 
+        Potential App Names: When & Where, Findr, Vibe
+
 
         ---
 
@@ -186,7 +188,7 @@ def run_streamlit_app():
 
 
 
-    '''
+    
     # Initialize chat message history in Streamlit's session state if it doesn't exist.
     if MESSAGE_HISTORY_KEY not in st.session_state:
         st.session_state[MESSAGE_HISTORY_KEY] = []
@@ -211,4 +213,4 @@ def run_streamlit_app():
         
         # Append assistant's response to history.
         st.session_state[MESSAGE_HISTORY_KEY].append({'role': 'assistant', 'content': agent_response})
-    '''
+    

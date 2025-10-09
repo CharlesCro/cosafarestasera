@@ -110,7 +110,7 @@ def run_streamlit_app():
             
 
     with right:
-        st.header(':rainbow[Map Feature Coming Soon...]')
+        st.info('Map Feature Coming Soon...')
 
     '''
     # Initialize chat message history in Streamlit's session state if it doesn't exist.

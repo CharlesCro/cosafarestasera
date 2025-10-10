@@ -45,7 +45,7 @@ def run_streamlit_app():
 
         if st.button("Log out"):
             st.logout()
-        print(f"Welcome! {st.user.name}")
+        st.markdown(f"Welcome! {st.user.name}")
 
     st.sidebar.divider()
 

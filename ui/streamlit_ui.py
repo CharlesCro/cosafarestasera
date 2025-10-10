@@ -16,8 +16,8 @@ def run_streamlit_app():
     if 'search' not in st.session_state:
         st.session_state.search = False
 
-    st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
-    st.title('CosaFareStasera') # Main title of the app.
+    st.set_page_config(page_title='Locale', layout='wide') # Configures the browser tab title and page layout.
+    st.title('LocaleWeb') # Main title of the app.
     st.caption('Powered by ADK & Gemini') # Descriptive text.
     
 

@@ -3,10 +3,18 @@ import streamlit as st
 from services.adk_service import initialize_adk, run_adk_sync
 from config.settings import MESSAGE_HISTORY_KEY, get_api_key
 
+def login_screen():
+    st.header('Welcome to LocaleWeb')
+    if st.button("Log in with Google"):
+        st.login()
+
 def run_streamlit_app():
     '''
     Sets up and runs the Streamlit web application for the ADK chat assistant.
     '''
+
+    
+    
     if 'interests' not in st.session_state:
         st.session_state.interests = []  # Start with one input box
     if 'agent_response' not in st.session_state:
@@ -28,8 +36,20 @@ def run_streamlit_app():
     # Initialize ADK runner and session ID (cached to run only once).
     adk_runner, current_session_id = initialize_adk()
     
-    # Display session ID for debugging purposes
+    # User Info
+    with st.sidebar:
+        if not st.user.is_logged_in:
+            if st.button("Log in with Google"):
+                st.login()
+            st.stop()
+
+        if st.button("Log out"):
+            st.logout()
+        print(f"Welcome! {st.user.name}")
+
     st.sidebar.divider()
+
+    # Website Info
     st.sidebar.write(
         '''
         :orange[Developed] :orange[by:]
@@ -44,6 +64,7 @@ def run_streamlit_app():
         '''
     )
 
+    # Date & Location settings
     with st.sidebar:
         st.header('', divider = 'violet')
         st.session_state.location = st.text_input('**Enter Location**', width = 250, placeholder = 'e.g., Firenze, Italia')

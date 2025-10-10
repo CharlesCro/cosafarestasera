@@ -17,9 +17,10 @@ def run_streamlit_app():
         st.session_state.search = False
 
     st.set_page_config(page_title='CosaFareStasera', layout='wide') # Configures the browser tab title and page layout.
-    st.title(':blue[Cosa]Fare:red[Stasera]') # Main title of the app.
+    st.title('CosaFareStasera') # Main title of the app.
     st.caption('Powered by ADK & Gemini') # Descriptive text.
-    st.header('', divider = 'blue')
+    
+
     api_key = get_api_key() # Retrieve the API key from settings.
     if not api_key:
         st.error('Action Required: Google API Key Not Found or Invalid! Please set GOOGLE_API_KEY in your .env file. ⚠️')
@@ -37,14 +38,14 @@ def run_streamlit_app():
         This app allows users to search for things to do in the specified date, location
         and provide customized interests and hobbies for a tailored experience.
 
-        Potential App Names: When & Where, Findr, Vibe
+        Potential App Names: "When & Where" (WW for short), "Findr" (Too much like Grindr?), "vibe."
            
         
         '''
     )
 
     with st.sidebar:
-        st.header('', divider = 'red')
+        st.header('', divider = 'violet')
         st.session_state.location = st.text_input('**Enter Location**', width = 250, placeholder = 'e.g., Firenze, Italia')
 
         today = datetime.datetime.now()
@@ -67,9 +68,11 @@ def run_streamlit_app():
                 st.session_state.search = True
         else:
             st.info('Please Add Interests to Begin Search')
+        
+        st.header('', divider = 'violet')
 
 
-        st.header('', divider = 'red')
+        
 
     print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
     

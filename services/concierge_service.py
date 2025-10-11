@@ -5,8 +5,9 @@ import os
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.genai import types as genai_types
-from agents.chat_agent import create_chat_agent
-from agents.search_agent import create_search_agent
+
+from concierge.agent import root_agent
+
 from config.settings import APP_NAME_FOR_ADK, USER_ID, INITIAL_STATE, ADK_SESSION_KEY
 
 # Import nest_asyncio at the top of the file
@@ -20,10 +21,10 @@ def initialize_adk():
     Uses Streamlit's cache_resource to ensure this runs only once per app load.
     """
     print("DEBUG: Initializing ADK runner and session service")
-    root_agent = create_search_agent() # Create our ADK agent defined earlier.
+    agent = root_agent # Create our ADK agent defined earlier.
     session_service = InMemorySessionService() # ADK's default in-memory session service for storing session data.
     runner = Runner( # The ADK Runner orchestrates the agent's execution.
-        agent=root_agent,
+        agent=agent,
         app_name=APP_NAME_FOR_ADK,
         session_service=session_service
     )

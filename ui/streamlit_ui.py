@@ -1,7 +1,15 @@
 import datetime
+import os
+import xyzservices.providers as xyz
+
+from dotenv import load_dotenv
+import folium
 import streamlit as st
-from services.adk_service import initialize_adk, run_adk_sync
+
+from services.concierge_service import initialize_adk, run_adk_sync
 from config.settings import MESSAGE_HISTORY_KEY, get_api_key
+
+load_dotenv()
 
 def login_screen():
     st.header('Welcome to LocaleWeb')
@@ -12,8 +20,6 @@ def run_streamlit_app():
     '''
     Sets up and runs the Streamlit web application for the ADK chat assistant.
     '''
-
-    
     
     if 'interests' not in st.session_state:
         st.session_state.interests = []  # Start with one input box
@@ -134,7 +140,32 @@ def run_streamlit_app():
             
 
     with right:
-        st.info('Map Feature Coming Soon...')
+        
+        # DISPLAY MAP DEFAULT LOCATION
+        map = folium.Map(location = [41.8719, 12.5674], tiles = xyz.Jawg.Matrix(accessToken = os.getenv('JAWG_API_KEY') , variant = "jawg-matrix"), zoom_control = False, zoom_start = 11)
+
+        # MAP MARKERS
+        folium.CircleMarker(location=[41.8719, 12.5674],
+                        radius=10,
+                        color="mediumslateblue",
+                        stroke=False,
+                        fill=True,
+                        fill_opacity=1,
+                        opacity=1,
+                        popup="Roma, IT").add_to(map)
+
+        st.components.v1.html(folium.Figure().add_child(map).render(), height=500)
+        st.info('Alpha Version', width = 120)
+
+
+
+
+
+
+
+
+
+
 
     '''
     # Initialize chat message history in Streamlit's session state if it doesn't exist.

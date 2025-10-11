@@ -31,7 +31,10 @@ def run_streamlit_app():
         st.session_state.search = False
 
     st.set_page_config(page_title='Locale', layout='wide') # Configures the browser tab title and page layout.
-    st.title('LocaleWeb') # Main title of the app.
+    
+    col1, col2, _ = st.columns([1, 3, 14])
+    col1.image('ui/assets/logo_locale.jpg', width = 75)
+    col2.title('LocaleWeb') # Main title of the app.
     st.caption('Powered by ADK & Gemini') # Descriptive text.
     
 
@@ -41,7 +44,7 @@ def run_streamlit_app():
         st.stop() # Stop the application if the API key is missing, prompting the user for action.
     # Initialize ADK runner and session ID (cached to run only once).
     adk_runner, current_session_id = initialize_adk()
-    
+
     # User Info
     with st.sidebar:
         if not st.user.is_logged_in:
@@ -54,7 +57,7 @@ def run_streamlit_app():
         st.markdown(f"Welcome, {st.user.name}")
 
     st.sidebar.divider()
-
+    
     # Website Info
     st.sidebar.write(
         '''
@@ -97,6 +100,8 @@ def run_streamlit_app():
             st.info('Please Add Interests to Begin Search')
         
         st.header('', divider = 'violet')
+
+        
 
 
         

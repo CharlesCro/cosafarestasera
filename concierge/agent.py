@@ -34,7 +34,6 @@ Your final response **MUST ONLY** contain the structured list of events. Structu
 For every confirmed activity or event, generate a dedicated bullet point with the following four components, and **ONLY** these components:
 
 * **Activity/Event Name** (Bolded)
-* **Longitude and Lagitude:** Address of event in longitude latitude form, e.g., "<41.8719, -12.5674>"
 * **Date(s) & Time:** The exact date(s) and time range (e.g., "October 15th, 2025, 10:00 AM - 2:00 PM").
 * **Source Link:** A single, direct, functioning hyperlink formatted using **Markdown syntax: `[Source Link Text](URL)`** (e.g., "Official Website," "Tickets," or the domain name).
 * **Brief Description:** A concise 1-2 sentence summary of the activity.

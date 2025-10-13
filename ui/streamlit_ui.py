@@ -71,10 +71,22 @@ def run_streamlit_app():
            
         
         '''
-    )
+    ) 
 
-    # Date & Location settings
-    with st.sidebar:
+    print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
+    
+    left, right = st.columns([1, 2], border = True)
+
+    with left:
+        st.session_state.interests = st.multiselect(
+            '**Please add your interests**',
+            ['Art', 'Jazz', 'Farmer\'s Market', 'Theatre', 'Hiking',' Disco'],
+            max_selections = 20,
+            accept_new_options = True
+        )
+
+        st.divider()
+
         st.header('', divider = 'violet')
         st.session_state.location = st.text_input('**Enter Location**', width = 250, placeholder = 'e.g., Firenze, Italia')
 
@@ -100,26 +112,11 @@ def run_streamlit_app():
             st.info('Please Add Interests to Begin Search')
         
         st.header('', divider = 'violet')
-
         
-
-
         
+            
 
-    print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
-    
-    left, right = st.columns([1, 2], border = True)
-
-    with left:
-        st.session_state.interests = st.multiselect(
-            '**Please add your interests**',
-            ['Art', 'Jazz', 'Farmer\'s Market', 'Theatre', 'Hiking',' Disco'],
-            max_selections = 20,
-            accept_new_options = True
-        )
-
-        st.divider()
-        
+    with right:
         if st.session_state.search:
             st.session_state.search = False
             prompt = f"""
@@ -143,25 +140,25 @@ def run_streamlit_app():
         if st.session_state.agent_response:
             st.markdown(st.session_state.agent_response)
             
+        if st.session_state.agent_response:
+            st.info('Map Test Version (Not Complete)')
+            # DISPLAY MAP DEFAULT LOCATION
+            map = folium.Map(location = [41.8719, 12.5674], tiles = xyz.Jawg.Matrix(accessToken = os.getenv('JAWG_API_KEY') , variant = "jawg-matrix"), zoom_control = False, zoom_start = 11)
 
-    with right:
-        
-        # DISPLAY MAP DEFAULT LOCATION
-        map = folium.Map(location = [41.8719, 12.5674], tiles = xyz.Jawg.Matrix(accessToken = os.getenv('JAWG_API_KEY') , variant = "jawg-matrix"), zoom_control = False, zoom_start = 11)
+            # MAP MARKERS
+            folium.CircleMarker(location=[41.8719, 12.5674],
+                            radius=10,
+                            color="mediumslateblue",
+                            stroke=False,
+                            fill=True,
+                            fill_opacity=1,
+                            opacity=1,
+                            popup="Roma, IT").add_to(map)
 
-        # MAP MARKERS
-        folium.CircleMarker(location=[41.8719, 12.5674],
-                        radius=10,
-                        color="mediumslateblue",
-                        stroke=False,
-                        fill=True,
-                        fill_opacity=1,
-                        opacity=1,
-                        popup="Roma, IT").add_to(map)
-
-        st.components.v1.html(folium.Figure().add_child(map).render(), height=500)
-        st.info('Alpha Version', width = 120)
-
+            st.components.v1.html(folium.Figure().add_child(map).render(), height=500)
+            
+        else:
+            st.info("Press *Search* for assistance")
 
 
 

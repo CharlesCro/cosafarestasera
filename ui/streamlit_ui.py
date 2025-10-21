@@ -1,43 +1,37 @@
+# Standard Libraries
 import datetime
 import os
 import xyzservices.providers as xyz
 
+# Non-Standard Libraries
 from dotenv import load_dotenv
 import folium
 import streamlit as st
 
+# Custom Modules
 from services.concierge_service import initialize_adk, run_adk_sync
-from config.settings import MESSAGE_HISTORY_KEY, get_api_key
+from config.settings import get_api_key
+from utils.helpers import init_session_state
+from ui.components import load_header, load_sidebar
 
+# Import Environment Variables
 load_dotenv()
-
-def login_screen():
-    st.header('Welcome to LocaleWeb')
-    if st.button("Log in with Google"):
-        st.login()
 
 def run_streamlit_app():
     '''
     Sets up and runs the Streamlit web application for the ADK chat assistant.
     '''
     
-    if 'interests' not in st.session_state:
-        st.session_state.interests = []  # Start with one input box
-    if 'agent_response' not in st.session_state:
-        st.session_state.agent_response = None
-    if 'range_on' not in st.session_state:
-        st.session_state.range_on = False
-    if 'search' not in st.session_state:
-        st.session_state.search = False
+    # Initialize session state variables
+    init_session_state()
 
+    # Page Configuration
     st.set_page_config(page_title='Locale', layout='wide') # Configures the browser tab title and page layout.
-    
-    col1, col2, _ = st.columns([1, 3, 14])
-    col1.image('ui/assets/logo_locale.jpg', width = 75)
-    col2.title('LocaleWeb') # Main title of the app.
-    st.caption('Powered by ADK & Gemini') # Descriptive text.
-    
 
+    # Load header
+    load_header()
+
+    # Initialize ADK Session with API key
     api_key = get_api_key() # Retrieve the API key from settings.
     if not api_key:
         st.error('Action Required: Google API Key Not Found or Invalid! Please set GOOGLE_API_KEY in your .env file. ⚠️')
@@ -45,39 +39,16 @@ def run_streamlit_app():
     # Initialize ADK runner and session ID (cached to run only once).
     adk_runner, current_session_id = initialize_adk()
 
-    # User Info
-    with st.sidebar:
-        if not st.user.is_logged_in:
-            if st.button("Log in with Google"):
-                st.login()
-            st.stop()
-
-        if st.button("Log out"):
-            st.logout()
-        st.markdown(f"Welcome, {st.user.name}")
-
-    st.sidebar.divider()
-    
-    # Website Info
-    st.sidebar.write(
-        '''
-        :orange[Developed] :orange[by:]
-        Charles Crocicchia & Alex Fratoni
-
-        This app allows users to search for things to do in the specified date, location
-        and provide customized interests and hobbies for a tailored experience.
-
-        Potential App Names: "When & Where" (WW for short), "Findr" (Too much like Grindr?), "vibe."
-           
-        
-        '''
-    ) 
+    # Load sidebar (Login & info)
+    load_sidebar(adk_runner, current_session_id)
 
     print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
     
+    # <-- Main Page -->
     left, right = st.columns([1, 2], border = True)
 
     with left:
+        # Interests component
         st.session_state.interests = st.multiselect(
             '**Please add your interests**',
             ['Art', 'Jazz', 'Farmer\'s Market', 'Theatre', 'Hiking',' Disco'],
@@ -98,9 +69,9 @@ def run_streamlit_app():
             st.session_state.range_on = False
 
         if st.session_state.range_on:
-            st.session_state.date_range = st.date_input('**Enter date**', (today, datetime.date(today.year + 1, today.day, today.month)), format="MM.DD.YYYY")
+            st.session_state.date_range = st.date_input('**Enter date**', (today, datetime.date(today.year + 1, today.month, today.day)), format="YYYY.MM.DD")
         else:
-            st.session_state.date_range = st.date_input('**Enter date**', format="MM.DD.YYYY")
+            st.session_state.date_range = st.date_input('**Enter date**', format="YYYY.MM.DD")
 
         
 
@@ -169,29 +140,4 @@ def run_streamlit_app():
 
 
 
-    '''
-    # Initialize chat message history in Streamlit's session state if it doesn't exist.
-    if MESSAGE_HISTORY_KEY not in st.session_state:
-        st.session_state[MESSAGE_HISTORY_KEY] = []
-    # Display existing chat messages from the session state.
-    for message in st.session_state[MESSAGE_HISTORY_KEY]:
-        with st.chat_message(message['role']): # Use Streamlit's chat message container for styling.
-            st.markdown(message['content'])
-    # Handle new user input.
-    if prompt := st.chat_input('Enter message'):
-        # Append user's message to history and display it.
-        st.session_state[MESSAGE_HISTORY_KEY].append({'role': 'user', 'content': prompt})
-        with st.chat_message('user'):
-            st.markdown(prompt)
-        # Process the user's message with the ADK agent and display the response.
-        with st.chat_message('assistant'):
-            message_placeholder = st.empty() # Create an empty placeholder to update with the assistant's response.
-            with st.spinner('Assistant is thinking...'): # Show a spinner while the agent processes the request.
-                print(f"DEBUG UI: Sending message to ADK with session ID: {current_session_id}")
-                agent_response = run_adk_sync(adk_runner, current_session_id, prompt) # Call the synchronous ADK runner.
-                print(f"DEBUG UI: Received response from ADK: {agent_response[:50]}...")
-                message_placeholder.markdown(agent_response) # Update the placeholder with the final response.
-        
-        # Append assistant's response to history.
-        st.session_state[MESSAGE_HISTORY_KEY].append({'role': 'assistant', 'content': agent_response})
-    '''
+    

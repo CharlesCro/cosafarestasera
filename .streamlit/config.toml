@@ -2,17 +2,20 @@
 base = "dark"
 
 # General color setup
-textColor = "#e2e8f0"
-primaryColor = "#615fff"
-backgroundColor = "#1d293d"
-secondaryBackgroundColor = "#0f172b"
+# Text Color (Soft, light violet)
+textColor = "#E5E0FF"
+# Primary Color (Vibrant Neon Magenta/Hot Pink)
+primaryColor = "#FF00FF"
+# Background Color (Dark, warm charcoal gray)
+backgroundColor = "#1A1625"
+# Secondary Background Color (Slightly lighter, warm dark gray for depth)
+secondaryBackgroundColor = "#282233"
 
 # Widgets
 showWidgetBorder = true
-borderColor = "#314158"
+# Border Color (Deep purple that ties the colors together)
+borderColor = "#5A3A70"
 
-# Dataframes
-dataframeHeaderBackgroundColor = "#1d293d"
 
 # Base text
 font = "'Space Grotesk':https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap"

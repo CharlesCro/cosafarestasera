@@ -7,7 +7,7 @@ load_dotenv() # Load environment variables from a .env file. This is crucial for
 # Suppress most ADK internal logs to keep the console clean during Streamlit runs.
 logging.basicConfig(level=logging.ERROR) 
 
-MODEL_GEMINI = "gemini-2.0-flash" # Specifies the Google Gemini model to be used by the ADK agent.
+MODEL_GEMINI = "gemini-2.5-flash" # Specifies the Google Gemini model to be used by the ADK agent.
 APP_NAME_FOR_ADK = "chat_app" # A unique name for your application within ADK, used for session management.
 
 USER_ID = "charlescro" # A default user ID. In a real application, this would be dynamic (e.g., from a login system).

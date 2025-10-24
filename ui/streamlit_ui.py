@@ -1,18 +1,21 @@
 # Standard Libraries
 import datetime
+import time
 import os
-import xyzservices.providers as xyz
+import ast
+
 
 # Non-Standard Libraries
+import xyzservices.providers as xyz
 from dotenv import load_dotenv
 import folium
 import streamlit as st
 
 # Custom Modules
-from services.concierge_service import initialize_adk, run_adk_sync
+from concierge.agent import invoke
 from config.settings import get_api_key
 from utils.helpers import init_session_state
-from ui.components import load_header, load_sidebar
+from ui.components import load_header, load_sidebar, load_events
 
 # Import Environment Variables
 load_dotenv()
@@ -36,13 +39,10 @@ def run_streamlit_app():
     if not api_key:
         st.error('Action Required: Google API Key Not Found or Invalid! Please set GOOGLE_API_KEY in your .env file. ⚠️')
         st.stop() # Stop the application if the API key is missing, prompting the user for action.
-    # Initialize ADK runner and session ID (cached to run only once).
-    adk_runner, current_session_id = initialize_adk()
+    
 
     # Load sidebar (Login & info)
-    load_sidebar(adk_runner, current_session_id)
-
-    print(f"DEBUG UI: Using ADK session ID: {current_session_id}")
+    load_sidebar()
     
     # <-- Main Page -->
     left, right = st.columns([1, 2], border = True)
@@ -98,18 +98,19 @@ def run_streamlit_app():
                         """
                 
             with st.spinner('Searching...', show_time = True):
-                agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
-                import time
+                agent_response = invoke(prompt)
+                # agent_response = run_adk_sync(adk_runner, current_session_id, prompt)
+                
                 st.toast("Hip!")
                 time.sleep(0.5)
                 st.toast("Hip!")
                 time.sleep(0.5)
                 st.toast("Hooray!", icon="🎉")
 
-            st.session_state.agent_response = agent_response  
+            st.session_state.agent_response = ast.literal_eval(agent_response.strip().strip('```json').strip('```').strip())
 
         if st.session_state.agent_response:
-            st.markdown(st.session_state.agent_response)
+            load_events(st.session_state.agent_response)
             
         if st.session_state.agent_response:
             st.info('Map Test Version (Not Complete)')
